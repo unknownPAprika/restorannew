@@ -2,6 +2,11 @@ FROM php:8.2-apache
 
 # Устанавливаем SQLite3 и расширение PDO SQLite
 RUN docker-php-ext-install pdo_sqlite
+RUN apt-get update && apt-get install -y \
+    sqlite3 \
+    libsqlite3-dev \
+    && docker-php-ext-install pdo_sqlite \
+    && apt-get clean
 
 # Копируем все файлы сайта в директорию Apache
 COPY . /var/www/html/
