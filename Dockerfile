@@ -1,19 +1,20 @@
 FROM php:8.2-apache
 
-# Устанавливаем SQLite3 и расширение PDO SQLite
-RUN docker-php-ext-install pdo_sqlite
+# Устанавливаем системные зависимости и расширение PDO SQLite
 RUN apt-get update && apt-get install -y \
-    sqlite3 \
-    libsqlite3-dev \
+        sqlite3 \
+        libsqlite3-dev \
     && docker-php-ext-install pdo_sqlite \
     && apt-get clean
 
-# Копируем все файлы сайта в директорию Apache
+# Включаем mod_rewrite для Apache (опционально, но часто нужно для ЧПУ)
+RUN a2enmod rewrite
+
+# Копируем все файлы проекта в рабочую директорию Apache
 COPY . /var/www/html/
 
-# Включаем mod_rewrite (если нужен)
-RUN a2enmod rewrite
-RUN chown -R www-data:www-data /var/www/html && chmod -R 755 /var/www/html
+# (Опционально) Устанавливаем права на запись для SQLite, если база будет создаваться внутри контейнера
+# RUN chown -R www-data:www-data /var/www/html
 
-# Открываем порт 80
+# Открываем порт 80 (стандартный для Apache)
 EXPOSE 80
